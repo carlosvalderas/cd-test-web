@@ -1,0 +1,158 @@
+<?php
+
+/**
+ * This is the model class for table "usuario".
+ *
+ * The followings are the available columns in table 'usuario':
+ * @property integer $id_usuario
+ * @property string $Nombres
+ * @property string $apellido_p
+ * @property string $apellido_m
+ * @property integer $rut
+ * @property string $dv
+ * @property string $telefono
+ * @property string $direccion
+ * @property string $mail
+ * @property integer $cargo_id_cargo
+ * @property integer $estado_id_estado
+ * @property string $Huella
+ *
+ * The followings are the available model relations:
+ * @property Conectado[] $conectados
+ * @property Contrato[] $contratos
+ * @property Empleado[] $empleados
+ * @property Estudiante[] $estudiantes
+ * @property Login[] $logins
+ * @property Perfil[] $perfils
+ * @property Remuneracion[] $remuneracions
+ * @property Cargo $cargoIdCargo
+ * @property Estado $estadoIdEstado
+ * @property UsuarioBeneficio[] $usuarioBeneficios
+ * @property UsuarioExcepcion[] $usuarioExcepcions
+ */
+class Usuario extends CActiveRecord
+{
+	/**
+	 * @return string the associated database table name
+	 */
+	public function tableName()
+	{
+		return 'usuario';
+	}
+
+	/**
+	 * @return array validation rules for model attributes.
+	 */
+	public function rules()
+	{
+		// NOTE: you should only define rules for those attributes that
+		// will receive user inputs.
+		return array(
+			array('cargo_id_cargo, estado_id_estado', 'required'),
+			array('rut, cargo_id_cargo, estado_id_estado', 'numerical', 'integerOnly'=>true),
+			array('Nombres, apellido_p, apellido_m, dv, telefono, direccion, mail, Huella', 'length', 'max'=>45),
+			// The following rule is used by search().
+			// @todo Please remove those attributes that should not be searched.
+			array('id_usuario, Nombres, apellido_p, apellido_m, rut, dv, telefono, direccion, mail, cargo_id_cargo, estado_id_estado, Huella', 'safe', 'on'=>'search'),
+		);
+	}
+
+	/**
+	 * @return array relational rules.
+	 */
+	public function relations()
+	{
+		// NOTE: you may need to adjust the relation name and the related
+		// class name for the relations automatically generated below.
+		return array(
+			'conectados' => array(self::HAS_MANY, 'Conectado', 'usuario_id_usuario'),
+			'contratos' => array(self::HAS_MANY, 'Contrato', 'usuario_id_usuario'),
+			'empleados' => array(self::HAS_MANY, 'Empleado', 'usuario_id_usuario'),
+			'estudiantes' => array(self::HAS_MANY, 'Estudiante', 'usuario_id_usuario'),
+			'logins' => array(self::HAS_MANY, 'Login', 'usuario_id_usuario'),
+			'perfils' => array(self::HAS_MANY, 'Perfil', 'usuario_id_usuario'),
+			'remuneracions' => array(self::HAS_MANY, 'Remuneracion', 'usuario_id_usuario'),
+			'cargoIdCargo' => array(self::BELONGS_TO, 'Cargo', 'cargo_id_cargo'),
+			'estadoIdEstado' => array(self::BELONGS_TO, 'Estado', 'estado_id_estado'),
+			'usuarioBeneficios' => array(self::HAS_MANY, 'UsuarioBeneficio', 'usuario_id_usuario'),
+			'usuarioExcepcions' => array(self::HAS_MANY, 'UsuarioExcepcion', 'usuario_id_usuario'),
+		);
+	}
+
+	/**
+	 * @return array customized attribute labels (name=>label)
+	 */
+	public function attributeLabels()
+	{
+		return array(
+			'id_usuario' => 'Id Usuario',
+			'Nombres' => 'Nombres',
+			'apellido_p' => 'Apellido P',
+			'apellido_m' => 'Apellido M',
+			'rut' => 'Rut',
+			'dv' => 'Dv',
+			'telefono' => 'Telefono',
+			'direccion' => 'Direccion',
+			'mail' => 'Mail',
+			'cargo_id_cargo' => 'Cargo Id Cargo',
+			'estado_id_estado' => 'Estado Id Estado',
+			'Huella' => 'Huella',
+		);
+	}
+
+	/**
+	 * Retrieves a list of models based on the current search/filter conditions.
+	 *
+	 * Typical usecase:
+	 * - Initialize the model fields with values from filter form.
+	 * - Execute this method to get CActiveDataProvider instance which will filter
+	 * models according to data in model fields.
+	 * - Pass data provider to CGridView, CListView or any similar widget.
+	 *
+	 * @return CActiveDataProvider the data provider that can return the models
+	 * based on the search/filter conditions.
+	 */
+	public function search()
+	{
+		// @todo Please modify the following code to remove attributes that should not be searched.
+
+		$criteria=new CDbCriteria;
+
+		$criteria->compare('id_usuario',$this->id_usuario);
+		$criteria->compare('Nombres',$this->Nombres,true);
+		$criteria->compare('apellido_p',$this->apellido_p,true);
+		$criteria->compare('apellido_m',$this->apellido_m,true);
+		$criteria->compare('rut',$this->rut);
+		$criteria->compare('dv',$this->dv,true);
+		$criteria->compare('telefono',$this->telefono,true);
+		$criteria->compare('direccion',$this->direccion,true);
+		$criteria->compare('mail',$this->mail,true);
+		$criteria->compare('cargo_id_cargo',$this->cargo_id_cargo);
+		$criteria->compare('estado_id_estado',$this->estado_id_estado);
+		$criteria->compare('Huella',$this->Huella,true);
+
+		return new CActiveDataProvider($this, array(
+			'criteria'=>$criteria,
+		));
+	}
+
+	/**
+	 * Returns the static model of the specified AR class.
+	 * Please note that you should have this exact method in all your CActiveRecord descendants!
+	 * @param string $className active record class name.
+	 * @return Usuario the static model class
+	 */
+	public static function model($className=__CLASS__)
+	{
+		return parent::model($className);
+	}
+        
+        public function listar()
+        {
+            $usuarios = array();
+            foreach(Usuario::model()->findAll(array('order'=>'apellido_p,apellido_m')) as $usuario){
+                $usuarios[] = array('id_usuario' => $usuario->id_usuario,'Nombres'=> $usuario->apellido_p." ".$usuario->apellido_m.", ".$usuario->Nombres);
+            }
+            return $usuarios;
+        }
+}
